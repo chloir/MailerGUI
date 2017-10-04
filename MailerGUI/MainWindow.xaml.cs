@@ -29,5 +29,38 @@ namespace MailerGUI
         {
             Environment.Exit(0);
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            string FromAdress = MailAdress.Text;
+            string MailPass = MailPassword.Password;
+            string sub = Subject.Text;
+            string des = ToAdress.Text;
+            string bod = Body.Text;
+
+            var smtp = new System.Net.Mail.SmtpClient();
+            smtp.Host = "smtp.gmail.com";
+            smtp.Port = 587;
+
+            smtp.Credentials = new System.Net.NetworkCredential(FromAdress, MailPass);
+
+            smtp.EnableSsl = true;
+
+            try
+            {
+                var Msg = new System.Net.Mail.MailMessage(FromAdress, des, sub, bod);
+                smtp.Send(Msg);
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Exception occurred!");
+            }
+            finally
+            {
+                MessageBox.Show("success!");
+            }
+
+            
+        }
     }
 }

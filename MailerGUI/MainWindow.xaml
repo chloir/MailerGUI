@@ -11,8 +11,9 @@
             <RowDefinition Height="1.2*"/>
             <RowDefinition Height="1.2*"/>
             <RowDefinition Height="1.2*"/>
-            <RowDefinition Height="6*"/>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2.5*"/>
@@ -21,14 +22,16 @@
         <TextBlock Grid.Row="0" Grid.Column="0" Text="MailAdress" Margin="8" FontSize="14" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Password" Margin="8" FontSize="14" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Subject" Margin="8" FontSize="14" HorizontalAlignment="Left"/>
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="本文" VerticalAlignment="Top" Margin="7.6" FontSize="14"/>
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="本文" VerticalAlignment="Top" Margin="7.6" FontSize="14"/>
         <TextBox x:Name="MailAdress" Grid.Row="0" Grid.Column="1" Text="" Margin="7"/>
         <PasswordBox x:Name="MailPassword" Grid.Row="1" Grid.Column="1" Margin="7" Password=""/>
         <TextBox x:Name="Subject" Grid.Row="2" Grid.Column="1" Text="" Margin="7"/>
-        <TextBox x:Name="Body" Grid.Row="3" Grid.Column="1" Text="" Margin="7"/>
+        <TextBox x:Name="Body" Grid.Row="5" Grid.Column="1" Text="" Margin="7"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="To" Margin="7"/>
+        <TextBox x:Name="ToAdress" Grid.Row="3" Grid.Column="1" Text="" Margin="7"/>
         <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
             <Button Content="Cancel" Margin="4" Width="70" Click="Button_Click"/>
-            <Button Content="Send" Margin="4" Width="70"/>
+            <Button Content="Send" Margin="4" Width="70" Click="Button_Click_1"/>
         </StackPanel>
     </Grid>
 </Window>
