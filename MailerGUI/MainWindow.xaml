@@ -5,8 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MailerGUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Mailer" ResizeMode="NoResize" Width="530" Height="350">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1.2*"/>
+            <RowDefinition Height="1.2*"/>
+            <RowDefinition Height="1.2*"/>
+            <RowDefinition Height="6*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2.5*"/>
+            <ColumnDefinition Width="7.5*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="MailAdress" Margin="8" FontSize="14" HorizontalAlignment="Left"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Password" Margin="8" FontSize="14" HorizontalAlignment="Left"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Subject" Margin="8" FontSize="14" HorizontalAlignment="Left"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="本文" VerticalAlignment="Top" Margin="7.6" FontSize="14"/>
+        <TextBox x:Name="MailAdress" Grid.Row="0" Grid.Column="1" Text="" Margin="7"/>
+        <PasswordBox x:Name="MailPassword" Grid.Row="1" Grid.Column="1" Margin="7" Password=""/>
+        <TextBox x:Name="Subject" Grid.Row="2" Grid.Column="1" Text="" Margin="7"/>
+        <TextBox x:Name="Body" Grid.Row="3" Grid.Column="1" Text="" Margin="7"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+            <Button Content="Cancel" Margin="4" Width="70" Click="Button_Click"/>
+            <Button Content="Send" Margin="4" Width="70"/>
+        </StackPanel>
     </Grid>
 </Window>
