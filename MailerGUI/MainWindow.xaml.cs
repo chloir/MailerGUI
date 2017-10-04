@@ -48,6 +48,14 @@ namespace MailerGUI
                 EnableSsl = true
             };
 
+            Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
+            excel.Visible = false;
+
+            Microsoft.Office.Interop.Excel.Workbook workbook = excel.Workbooks.Open("filename");
+
+            workbook.Close();
+            excel.Quit();
+
             try
             {
                 var Msg = new System.Net.Mail.MailMessage(FromAdress, des, sub, bod);
