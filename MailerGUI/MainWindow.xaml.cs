@@ -38,13 +38,15 @@ namespace MailerGUI
             string des = ToAdress.Text;
             string bod = Body.Text;
 
-            var smtp = new System.Net.Mail.SmtpClient();
-            smtp.Host = "smtp.gmail.com";
-            smtp.Port = 587;
+            var smtp = new System.Net.Mail.SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
 
-            smtp.Credentials = new System.Net.NetworkCredential(FromAdress, MailPass);
+                Credentials = new System.Net.NetworkCredential(FromAdress, MailPass),
 
-            smtp.EnableSsl = true;
+                EnableSsl = true
+            };
 
             try
             {
@@ -57,7 +59,7 @@ namespace MailerGUI
             }
             finally
             {
-                MessageBox.Show("success!");
+                MessageBox.Show("Success!");
             }
 
             
