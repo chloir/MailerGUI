@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ClosedXML.Excel;
 
 namespace MailerGUI
 {
@@ -35,7 +36,7 @@ namespace MailerGUI
             string FromAdress = MailAdress.Text;
             string MailPass = MailPassword.Password;
             string sub = Subject.Text;
-            string des = ToAdress.Text;
+            string adresses = ListFile.Text;
             string bod = Body.Text;
 
             var smtp = new System.Net.Mail.SmtpClient
@@ -48,18 +49,13 @@ namespace MailerGUI
                 EnableSsl = true
             };
 
-            Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
-            excel.Visible = false;
-
-            Microsoft.Office.Interop.Excel.Workbook workbook = excel.Workbooks.Open("filename");
-
-            workbook.Close();
-            excel.Quit();
+            var workbook = new XLWorkbook();
+            IXLWorksheet worksheet = workbook.Worksheets.Add(adresses);
 
             try
             {
-                var Msg = new System.Net.Mail.MailMessage(FromAdress, des, sub, bod);
-                smtp.Send(Msg);
+                //var Msg = new System.Net.Mail.MailMessage(FromAdress, to, sub, bod);
+                //smtp.Send(Msg);
             }
             catch(Exception)
             {
