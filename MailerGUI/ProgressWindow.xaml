@@ -11,7 +11,7 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="Mailing..." VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" FontSize="16"/>
-        <ProgressBar x:Name="progbar" Grid.Row="1" VerticalAlignment="Center" Height="30" Margin="18"/>
+        <TextBlock Grid.Row="0" Text="送信中..." VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" FontSize="16"/>
+        <ProgressBar x:Name="progbar" Grid.Row="1" VerticalAlignment="Center" Height="30" Margin="18" IsIndeterminate="True"/>
     </Grid>
 </Window>

@@ -1,6 +1,18 @@
 ﻿using ClosedXML.Excel;
 using System;
 using System.Windows;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
 
 namespace MailerGUI
 {
@@ -9,6 +21,7 @@ namespace MailerGUI
     /// </summary>
     public partial class MainWindow : Window
     {
+
         public MainWindow()
         {
             InitializeComponent();
@@ -19,7 +32,48 @@ namespace MailerGUI
             Environment.Exit(0);
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private async Task LockUI(Func<Task> act)
+        {
+            var topElm = ((UIElement)VisualTreeHelper.GetChild(this, 0));
+            var oldEnabled = topElm.IsEnabled;
+            var oldCursor = this.Cursor;
+            try
+            {
+                this.Cursor = Cursors.Wait;
+                topElm.IsEnabled = false;
+                await act();
+            }
+            finally
+            {
+                topElm.IsEnabled = oldEnabled;
+                this.Cursor = oldCursor;
+            }
+        }
+
+        private async void Button_Click_async(object sender, RoutedEventArgs e)
+        {
+            string messageboxtext = "メールを送信します、よろしいですか？";
+            string caption = "MailerGUI";
+            MessageBoxButton button = MessageBoxButton.OKCancel;
+            MessageBoxImage image = MessageBoxImage.Information;
+
+            MessageBoxResult result = MessageBox.Show(messageboxtext, caption, button, image);
+
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    await LockUI(async () => { await TaskAsync(); });
+                    break;
+                case MessageBoxResult.No:
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
+
+        public async Task TaskAsync()  //Ignore Intellisense. This works finely.
         {
             string FromAdress = MailAdress.Text;
             string MailPass = MailPassword.Password;
@@ -29,6 +83,10 @@ namespace MailerGUI
             string bodyAfter = BodyAfterVals.Text;
             var toad = new Object();        //Variable for saving values from ClosedXML.(toad/exnum)
             var exnum = new Object();
+
+            var ProgWin = new ProgressWindow();
+
+            ProgWin.Show();
 
             var smtp = new System.Net.Mail.SmtpClient   //Gmail authorization.
             {
@@ -47,7 +105,6 @@ namespace MailerGUI
 
             try
             {
-                var ProgWin = new ProgressWindow();
 
                 for (int i = 1; i <= last; i++)     //Mailing process. Use .xlsx file for resource.
                 {
@@ -59,18 +116,20 @@ namespace MailerGUI
                     exnum = num.Value;
                     toad = cell.Value;
 
-                    depbod = bod + exnum + bodyAfter;
+                    depbod = bod + exnum + "\n" + bodyAfter;
 
-                    var Msg = new System.Net.Mail.MailMessage(FromAdress, toad.ToString(), sub, bod);
+                    var Msg = new System.Net.Mail.MailMessage(FromAdress, toad.ToString(), sub, depbod);
                     smtp.Send(Msg);
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
+                ProgWin.Close();
                 MessageBox.Show("エラーが発生しました。");
             }
             finally
             {
+                ProgWin.Close();
                 MessageBox.Show("メール送信成功！");
             }
 
@@ -89,7 +148,7 @@ namespace MailerGUI
             //    MessageBox.Show("Success!");
             //}
             //These codes won't be used.(But leave for guarantee)
-            
+
         }
     }
 }
