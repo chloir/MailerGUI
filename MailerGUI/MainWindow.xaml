@@ -5,31 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MailerGUI"
         mc:Ignorable="d"
-        Title="Mailer" ResizeMode="NoResize" Width="530" Height="350">
+        Title="Mailer" ResizeMode="CanResizeWithGrip" Width="700" Height="462">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1.2*"/>
-            <RowDefinition Height="1.2*"/>
-            <RowDefinition Height="1.2*"/>
-            <RowDefinition Height="1.2*"/>
-            <RowDefinition Height="5*"/>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1.8*"/>
+            <RowDefinition Height="3.2*"/>
+            <RowDefinition Height="0.8*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2.5*"/>
             <ColumnDefinition Width="7.5*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="MailAdress" Margin="8" FontSize="14" HorizontalAlignment="Left"/>
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Password" Margin="8" FontSize="14" HorizontalAlignment="Left"/>
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Subject" Margin="8" FontSize="14" HorizontalAlignment="Left"/>
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="AdressList" Margin="8" FontSize="14" HorizontalAlignment="Left"/>
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="本文" VerticalAlignment="Top" Margin="7.6" FontSize="14"/>
-        <TextBox x:Name="MailAdress" Grid.Row="0" Grid.Column="1" Text="" Margin="7"/>
-        <PasswordBox x:Name="MailPassword" Grid.Row="1" Grid.Column="1" Margin="7" Password=""/>
-        <TextBox x:Name="Subject" Grid.Row="2" Grid.Column="1" Text="" Margin="7"/>
-        <TextBox x:Name="ListFile" Grid.Row="3" Grid.Column="1" Text="" Margin="7"/>
-        <TextBox x:Name="Body" Grid.Row="4" Grid.Column="1" Text="" Margin="7"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Gmailアドレス" FontSize="16" Margin="8,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="パスワード" Margin="8,0,0,0" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="題名" Margin="8,0,0,0" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="宛先(Excelファイル)" Margin="8,0,0,0" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="本文(前半)" VerticalAlignment="Top" Margin="8,8,0,0" FontSize="16"/>
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="本文(後半)" VerticalAlignment="Top" Margin="8,8,0,0" FontSize="16"/>
+        <TextBox x:Name="MailAdress" Grid.Row="0" Grid.Column="1" Text="" Margin="7" Height="24"/>
+        <PasswordBox x:Name="MailPassword" Grid.Row="1" Grid.Column="1" Margin="7" Password="" Height="24"/>
+        <TextBox x:Name="Subject" Grid.Row="2" Grid.Column="1" Text="" Margin="7" Height="24"/>
+        <TextBox x:Name="ListFile" Grid.Row="3" Grid.Column="1" Text="" Margin="7" Height="24"/>
+        <TextBox x:Name="Body" Grid.Row="4" Grid.Column="1" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Text="" Margin="7" FontSize="15"/>
+        <TextBox x:Name="BodyAfterVals" Grid.Row="5" Grid.Column="1" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Text="" Margin="7" FontSize="15"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,0,10,0">
             <Button Content="Cancel" Margin="4" Width="70" Click="Button_Click"/>
             <Button Content="Send" Margin="4" Width="70" Click="Button_Click_1"/>
         </StackPanel>

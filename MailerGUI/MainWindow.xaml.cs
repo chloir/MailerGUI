@@ -1,18 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ClosedXML.Excel;
+using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using ClosedXML.Excel;
 
 namespace MailerGUI
 {
@@ -38,8 +26,11 @@ namespace MailerGUI
             string sub = Subject.Text;
             string adresses = ListFile.Text;
             string bod = Body.Text;
+            string bodyAfter = BodyAfterVals.Text;
+            var toad = new Object();        //Variable for saving values from ClosedXML.(toad/exnum)
+            var exnum = new Object();
 
-            var smtp = new System.Net.Mail.SmtpClient
+            var smtp = new System.Net.Mail.SmtpClient   //Gmail authorization.
             {
                 Host = "smtp.gmail.com",
                 Port = 587,
@@ -49,23 +40,55 @@ namespace MailerGUI
                 EnableSsl = true
             };
 
-            var workbook = new XLWorkbook();
-            IXLWorksheet worksheet = workbook.Worksheets.Add(adresses);
+            XLWorkbook workbook = new XLWorkbook(adresses);
+            IXLWorksheet worksheet = workbook.Worksheet(1);
+
+            int last = worksheet.LastRowUsed().RowNumber();
 
             try
             {
-                //var Msg = new System.Net.Mail.MailMessage(FromAdress, to, sub, bod);
-                //smtp.Send(Msg);
+                var ProgWin = new ProgressWindow();
+
+                for (int i = 1; i <= last; i++)     //Mailing process. Use .xlsx file for resource.
+                {
+                    string depbod;
+
+                    IXLCell cell = worksheet.Cell(i, 1);
+                    IXLCell num = worksheet.Cell(i, 2);
+
+                    exnum = num.Value;
+                    toad = cell.Value;
+
+                    depbod = bod + exnum + bodyAfter;
+
+                    var Msg = new System.Net.Mail.MailMessage(FromAdress, toad.ToString(), sub, bod);
+                    smtp.Send(Msg);
+                }
             }
             catch(Exception)
             {
-                MessageBox.Show("Exception occurred!");
+                MessageBox.Show("エラーが発生しました。");
             }
             finally
             {
-                MessageBox.Show("Success!");
+                MessageBox.Show("メール送信成功！");
             }
 
+            //try
+            //{
+            //    var Msg = new System.Net.Mail.MailMessage(FromAdress, toad.ToString(), sub, bod);
+            //    //var Msg = new System.Net.Mail.MailMessage(FromAdress, to, sub, bod);
+            //    smtp.Send(Msg);
+            //}
+            //catch(Exception)
+            //{
+            //    MessageBox.Show("Exception occurred!");
+            //}
+            //finally
+            //{
+            //    MessageBox.Show("Success!");
+            //}
+            //These codes won't be used.(But leave for guarantee)
             
         }
     }
