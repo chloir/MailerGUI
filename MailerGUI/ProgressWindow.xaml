@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MailerGUI"
         mc:Ignorable="d"
-        Title="ProgressWindow" Height="120" Width="360" ResizeMode="NoResize">
+        Title="処理中" Height="110" Width="360" ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="3*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="送信中..." VerticalAlignment="Center" HorizontalAlignment="Left" Margin="7,0,0,0" FontSize="16"/>
-        <ProgressBar x:Name="progbar" Grid.Row="1" VerticalAlignment="Center" Height="30" Margin="18" IsIndeterminate="True"/>
+        <ProgressBar x:Name="progbar" Grid.Row="1" VerticalAlignment="Center" Height="20" Margin="18" IsIndeterminate="True"/>
     </Grid>
 </Window>

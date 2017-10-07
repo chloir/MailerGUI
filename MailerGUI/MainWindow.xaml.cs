@@ -1,18 +1,9 @@
 ﻿using ClosedXML.Excel;
 using System;
-using System.Windows;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 
 namespace MailerGUI
 {
@@ -21,7 +12,6 @@ namespace MailerGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             InitializeComponent();
@@ -29,7 +19,17 @@ namespace MailerGUI
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Environment.Exit(0);
+            string CloseMessage = "終了しますか？";
+            string CloseCaption = "終了";
+            MessageBoxButton CloseButton = MessageBoxButton.YesNo;
+            MessageBoxImage CloseImage = MessageBoxImage.Question;
+
+            MessageBoxResult CloseResult = MessageBox.Show(CloseMessage, CloseCaption, CloseButton, CloseImage);
+
+            if (CloseResult == MessageBoxResult.Yes)
+            {
+                Environment.Exit(0);
+            }
         }
 
         private async Task LockUI(Func<Task> act)
@@ -59,21 +59,13 @@ namespace MailerGUI
 
             MessageBoxResult result = MessageBox.Show(messageboxtext, caption, button, image);
 
-            switch (result)
+            if (result == MessageBoxResult.OK)
             {
-                case MessageBoxResult.Yes:
-                    await LockUI(async () => { await TaskAsync(); });
-                    break;
-                case MessageBoxResult.No:
-                    break;
-                default:
-                    break;
+                await LockUI(async () => { await Mailing(); });
             }
-
-
         }
 
-        public async Task TaskAsync()  //Ignore Intellisense. This works finely.
+        public async Task Mailing()
         {
             string FromAdress = MailAdress.Text;
             string MailPass = MailPassword.Password;
@@ -81,14 +73,14 @@ namespace MailerGUI
             string adresses = ListFile.Text;
             string bod = Body.Text;
             string bodyAfter = BodyAfterVals.Text;
-            var toad = new Object();        //Variable for saving values from ClosedXML.(toad/exnum)
+            var toad = new Object();
             var exnum = new Object();
 
             var ProgWin = new ProgressWindow();
 
             ProgWin.Show();
 
-            var smtp = new System.Net.Mail.SmtpClient   //Gmail authorization.
+            var smtp = new System.Net.Mail.SmtpClient
             {
                 Host = "smtp.gmail.com",
                 Port = 587,
@@ -106,7 +98,7 @@ namespace MailerGUI
             try
             {
 
-                for (int i = 1; i <= last; i++)     //Mailing process. Use .xlsx file for resource.
+                for (int i = 1; i <= last; i++)
                 {
                     string depbod;
 
@@ -119,7 +111,7 @@ namespace MailerGUI
                     depbod = bod + exnum + "\n" + bodyAfter;
 
                     var Msg = new System.Net.Mail.MailMessage(FromAdress, toad.ToString(), sub, depbod);
-                    smtp.Send(Msg);
+                    await smtp.SendMailAsync(Msg);
                 }
             }
             catch (Exception)
@@ -132,23 +124,6 @@ namespace MailerGUI
                 ProgWin.Close();
                 MessageBox.Show("メール送信成功！");
             }
-
-            //try
-            //{
-            //    var Msg = new System.Net.Mail.MailMessage(FromAdress, toad.ToString(), sub, bod);
-            //    //var Msg = new System.Net.Mail.MailMessage(FromAdress, to, sub, bod);
-            //    smtp.Send(Msg);
-            //}
-            //catch(Exception)
-            //{
-            //    MessageBox.Show("Exception occurred!");
-            //}
-            //finally
-            //{
-            //    MessageBox.Show("Success!");
-            //}
-            //These codes won't be used.(But leave for guarantee)
-
         }
     }
 }
