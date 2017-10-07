@@ -6,4 +6,8 @@
 ・文章の一部を変えたもの（例：当選番号などの一意な番号）を一斉に送ることができます。  
 ・下準備＞ExcelファイルのA列にアドレス、B列に変更する項目を入力してください。  
 
-#まだ開発中
+環境  
+・Visual Studio 2017 Community  
+・ClosedXML  
+
+質問・要望等は pic.preserve#gmail.com まで。(#=@)
