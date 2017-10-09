@@ -15,6 +15,7 @@ namespace MailerGUI
         public MainWindow()
         {
             InitializeComponent();
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -72,7 +73,6 @@ namespace MailerGUI
             string sub = Subject.Text;
             string adresses = ListFile.Text;
             string bod = Body.Text;
-            string bodyAfter = BodyAfterVals.Text;
             var toad = new Object();
             var exnum = new Object();
 
@@ -97,10 +97,8 @@ namespace MailerGUI
 
             try
             {
-
-                for (int i = 1; i <= last; i++)
+                for (int i = 2; i <= last; i++)
                 {
-                    string depbod;
 
                     IXLCell cell = worksheet.Cell(i, 1);
                     IXLCell num = worksheet.Cell(i, 2);
@@ -108,9 +106,9 @@ namespace MailerGUI
                     exnum = num.Value;
                     toad = cell.Value;
 
-                    depbod = bod + exnum + "\n" + bodyAfter;
+                    bod = bod.Replace("repl", exnum.ToString());
 
-                    var Msg = new System.Net.Mail.MailMessage(FromAdress, toad.ToString(), sub, depbod);
+                    var Msg = new System.Net.Mail.MailMessage(FromAdress, toad.ToString(), sub, bod);
                     await smtp.SendMailAsync(Msg);
                 }
             }

@@ -12,8 +12,7 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="1.8*"/>
-            <RowDefinition Height="3.2*"/>
+            <RowDefinition Height="4.8*"/>
             <RowDefinition Height="0.8*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -24,14 +23,15 @@
         <TextBlock Grid.Row="1" Grid.Column="0" Text="パスワード" Margin="8,0,0,0" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="2" Grid.Column="0" Text="題名" Margin="8,0,0,0" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="3" Grid.Column="0" Text="宛先(Excelファイル)" Margin="8,0,0,0" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="本文(前半)" VerticalAlignment="Top" Margin="8,8,0,0" FontSize="16"/>
-        <TextBlock Grid.Row="5" Grid.Column="0" Text="本文(後半)" VerticalAlignment="Top" Margin="8,8,0,0" FontSize="16"/>
+        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="4" Margin="8">
+            <TextBlock Text="本文" FontSize="16"/>
+            <TextBlock Text="(置き換えたい箇所を「repl」と記述)" FontSize="13" TextWrapping="Wrap" Margin="7"/>
+        </StackPanel>
         <TextBox x:Name="MailAdress" Grid.Row="0" Grid.Column="1" Text="/Gmailアドレスを入力/" Margin="7" Height="24" FontSize="17"/>
         <PasswordBox x:Name="MailPassword" Grid.Row="1" Grid.Column="1" Margin="7" Password="" Height="24" FontSize="17"/>
         <TextBox x:Name="Subject" Grid.Row="2" Grid.Column="1" Text="/メールの題名を入力/" Margin="7" Height="24" FontSize="17"/>
         <TextBox x:Name="ListFile" Grid.Row="3" Grid.Column="1" Text="/宛先メールアドレスの書かれたExcelファイルのパス/" Margin="7" Height="24" FontSize="17"/>
         <TextBox x:Name="Body" Grid.Row="4" Grid.Column="1" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Text="/使う前に「説明書.txt」を読んでね！/" Margin="7" FontSize="15"/>
-        <TextBox x:Name="BodyAfterVals" Grid.Row="5" Grid.Column="1" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Text="" Margin="7" FontSize="15"/>
         <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,0,10,0">
             <Button Content="Close" Margin="4" Width="70" Click="Button_Click"/>
             <Button Content="Send" Margin="4" Width="70" Click="Button_Click_async"/>
