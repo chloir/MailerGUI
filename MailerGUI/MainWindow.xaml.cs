@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using MailKit;
+using MimeKit;
 
 namespace MailerGUI
 {
@@ -73,32 +75,32 @@ namespace MailerGUI
             string sub = Subject.Text;
             string adresses = ListFile.Text;
             string bod = Body.Text;
+
+            var client = new MailKit.Net.Smtp.SmtpClient();
+            var workbook = new XLWorkbook();
             var toad = new Object();
             var exnum = new Object();
+
+            bool exceptionIsOcurred = false;
 
             var ProgWin = new ProgressWindow();
 
             ProgWin.Show();
 
-            var smtp = new System.Net.Mail.SmtpClient
-            {
-                Host = "smtp.gmail.com",
-                Port = 587,
+            try{
 
-                Credentials = new System.Net.NetworkCredential(FromAdress, MailPass),
+                await client.ConnectAsync("smtp.gmail.com", 465, MailKit.Security.SecureSocketOptions.SslOnConnect);
+                client.AuthenticationMechanisms.Remove("XOAUTH2");
 
-                EnableSsl = true
-            };
+                client.Authenticate(FromAdress,MailPass);
 
-            XLWorkbook workbook = new XLWorkbook(adresses);
-            IXLWorksheet worksheet = workbook.Worksheet(1);
+                workbook = new XLWorkbook(adresses);
+                IXLWorksheet worksheet = workbook.Worksheet(1);
+                int last = worksheet.LastRowUsed().RowNumber();
 
-            int last = worksheet.LastRowUsed().RowNumber();
-
-            try
-            {
                 for (int i = 2; i <= last; i++)
                 {
+                    string message = bod;
 
                     IXLCell cell = worksheet.Cell(i, 1);
                     IXLCell num = worksheet.Cell(i, 2);
@@ -106,21 +108,43 @@ namespace MailerGUI
                     exnum = num.Value;
                     toad = cell.Value;
 
-                    bod = bod.Replace("repl", exnum.ToString());
+                    message = message.Replace("repl", exnum.ToString());
 
-                    var Msg = new System.Net.Mail.MailMessage(FromAdress, toad.ToString(), sub, bod);
-                    await smtp.SendMailAsync(Msg);
+                    var Msg = new MimeKit.MimeMessage();
+                    Msg.From.Add(new MimeKit.MailboxAddress(FromAdress));
+                    Msg.Subject = sub;
+                    Msg.To.Add(new MimeKit.MailboxAddress(toad.ToString(), toad.ToString()));
+                    var Msgbuilder = new MimeKit.BodyBuilder();
+
+                    Msgbuilder.TextBody = message;
+                    Msg.Body = Msgbuilder.ToMessageBody();
+
+                    await client.SendAsync(Msg);
+
+                    Msg.To.RemoveAt(0);
                 }
             }
-            catch (Exception)
+            catch(Exception ex)
             {
                 ProgWin.Close();
-                MessageBox.Show("エラーが発生しました。");
+                client.Disconnect(true);
+                exceptionIsOcurred = true;
+                MessageBox.Show(ex.Message,"エラー");
+
+                System.IO.StreamWriter writer = new System.IO.StreamWriter("./errorlog.txt",true,new System.Text.UTF8Encoding(false));
+                writer.WriteLine("ErrorMessage:" + ex.Message);
+                writer.WriteLine("StackTrace:" + ex.StackTrace);
             }
-            finally
+
+            if(exceptionIsOcurred == true)
+            {
+                MessageBox.Show("必要事項および説明書を確認の上、もう一度お試しください。");
+            }
+            else
             {
                 ProgWin.Close();
-                MessageBox.Show("メール送信成功！");
+                client.Disconnect(true);
+                MessageBox.Show("メールは正常に送信されました。");
             }
         }
     }
