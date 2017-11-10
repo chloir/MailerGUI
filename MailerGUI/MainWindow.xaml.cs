@@ -1,9 +1,14 @@
-﻿using ClosedXML.Excel;
-using System;
+﻿using System;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using ClosedXML.Excel;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 
 namespace MailerGUI
 {
@@ -20,95 +25,105 @@ namespace MailerGUI
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string CloseMessage = "終了しますか？";
-            string CloseCaption = "終了";
-            MessageBoxButton CloseButton = MessageBoxButton.YesNo;
-            MessageBoxImage CloseImage = MessageBoxImage.Question;
+            const string closeMessage = "終了しますか？";
+            const string closeCaption = "終了";
+            const MessageBoxButton closeButton = MessageBoxButton.YesNo;
+            const MessageBoxImage closeImage = MessageBoxImage.Question;
 
-            MessageBoxResult CloseResult = MessageBox.Show(CloseMessage, CloseCaption, CloseButton, CloseImage);
+            var closeResult = MessageBox.Show(closeMessage, closeCaption, closeButton, closeImage);
 
-            if (CloseResult == MessageBoxResult.Yes)
+            if (closeResult == MessageBoxResult.Yes)
             {
                 Environment.Exit(0);
             }
         }
 
-        private async Task LockUI(Func<Task> act)
+        private async Task LockUi(Func<Task> act)
         {
+            if (act == null)
+            {
+                throw new ArgumentNullException(nameof(act));
+            }
+
             var topElm = ((UIElement)VisualTreeHelper.GetChild(this, 0));
             var oldEnabled = topElm.IsEnabled;
-            var oldCursor = this.Cursor;
+            var oldCursor = Cursor;
             try
             {
-                this.Cursor = Cursors.Wait;
+                Cursor = Cursors.Wait;
                 topElm.IsEnabled = false;
                 await act();
             }
             finally
             {
                 topElm.IsEnabled = oldEnabled;
-                this.Cursor = oldCursor;
+                Cursor = oldCursor;
             }
         }
 
-        private static void ErrorLogWriter(System.Exception ex)
+        private static void ErrorLogWriter(Exception ex)
         {
-            System.IO.StreamWriter writer = new System.IO.StreamWriter("./errorlog.txt", true, new System.Text.UTF8Encoding(false));
+            var writer = new StreamWriter("./errorlog.txt", true, new UTF8Encoding(false));
             writer.WriteLine("ErrorMessage:" + ex.Message);
             writer.WriteLine("StackTrace:" + ex.StackTrace);
         }
 
         private async void Button_Click_async(object sender, RoutedEventArgs e)
         {
-            string messageboxtext = "メールを送信します、よろしいですか？";
-            string caption = "MailerGUI";
-            MessageBoxButton button = MessageBoxButton.OKCancel;
-            MessageBoxImage image = MessageBoxImage.Information;
+            if (e == null)
+            {
+                throw new ArgumentNullException(nameof(e));
+            }
 
-            MessageBoxResult result = MessageBox.Show(messageboxtext, caption, button, image);
+            const string messageboxtext = "メールを送信します、よろしいですか？";
+            const string caption = "MailerGUI";
+            const MessageBoxButton button = MessageBoxButton.OKCancel;
+            const MessageBoxImage image = MessageBoxImage.Information;
+
+            var result = MessageBox.Show(messageboxtext, caption, button, image);
 
             if (result == MessageBoxResult.OK)
             {
-                await LockUI(async () => { await Mailing(); });
+                await LockUi(Act);
             }
         }
+
+        private async Task Act() => await Mailing();
 
         public async Task Mailing()
         {
 #region Datas from user form.
-            string FromAdress = MailAdress.Text;
-            string MailPass = MailPassword.Password;
-            string sub = Subject.Text;
-            string adresses = ListFile.Text;
-            string bod = Body.Text;
+            var fromAdress = MailAdress.Text;
+            var mailPass = MailPassword.Password;
+            var sub = Subject.Text;
+            var adresses = ListFile.Text;
+            var bod = Body.Text;
 #endregion
-            var client = new MailKit.Net.Smtp.SmtpClient();
+            var client = new SmtpClient();
 
-            var workbook = new XLWorkbook();
-            int last;
-            IXLWorksheet worksheet;
-            var toad = new Object();
-            var exnum = new Object();
+            var xlWorkbook = new XLWorkbook();
+            var toad = new object();
+            var exnum = new object();
 
-            int unSentListRow = 0;
+            var unSentListRow = 0;
 
-            bool exceptionIsOccurred = false;
-            bool exceptionInSendProcess = false;
+            var exceptionIsOccurred = false;
+            var exceptionInSendProcess = false;
 
-            var ProgWin = new ProgressWindow();
+            var progWin = new ProgressWindow();
 
-            ProgWin.Show();
+            progWin.Show();
 
             try
             {
-                await client.ConnectAsync("smtp.gmail.com", 465, MailKit.Security.SecureSocketOptions.SslOnConnect);
+                await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
 
-                client.Authenticate(FromAdress, MailPass);
+                client.Authenticate(fromAdress, mailPass);
             }
             catch(Exception ex)
             {
-                ProgWin.Close();
+                progWin.Close();
                 exceptionIsOccurred = true;
                 MessageBox.Show(ex.Message, "エラー");
             }
@@ -119,89 +134,88 @@ namespace MailerGUI
             try
             {
 
-                workbook = new XLWorkbook(adresses);
-                worksheet = workbook.Worksheet(1);
-                last = worksheet.LastRowUsed().RowNumber();
+                var workbook = new XLWorkbook(adresses);
+                var worksheet = workbook.Worksheet(1);
+                var last = worksheet.LastRowUsed().RowNumber();
 
-                for (int i = 2; i <= last; i++)
+                for (var i = 2; i <= last; i++)
                 {
                     ContinueSending:
 
                     try
                     {
-                        if (exceptionIsOccurred == true)
+                        if (exceptionIsOccurred)
                         {
                             i++;
                         }
 
-                        string message = bod;
+                        var message = bod;
 
-                        IXLCell cell = worksheet.Cell(i, 1);
-                        IXLCell num = worksheet.Cell(i, 2);
+                        var cell = worksheet.Cell(i, 1);
+                        var num = worksheet.Cell(i, 2);
 
                         exnum = num.Value;
                         toad = cell.Value;
 
                         message = message.Replace("repl", exnum.ToString());
 
-                        var Msg = new MimeKit.MimeMessage();
-                        Msg.From.Add(new MimeKit.MailboxAddress(FromAdress));
-                        Msg.Subject = sub;
-                        Msg.To.Add(new MimeKit.MailboxAddress(toad.ToString(), toad.ToString()));
-                        var Msgbuilder = new MimeKit.BodyBuilder();
+                        var msg = new MimeMessage();
+                        msg.From.Add(new MailboxAddress(fromAdress));
+                        msg.Subject = sub;
+                        msg.To.Add(new MailboxAddress(toad.ToString(), toad.ToString()));
+                        var msgbuilder = new BodyBuilder {TextBody = message};
 
-                        Msgbuilder.TextBody = message;
-                        Msg.Body = Msgbuilder.ToMessageBody();
+                        msg.Body = msgbuilder.ToMessageBody();
 
-                        await client.SendAsync(Msg);
+                        await client.SendAsync(msg);
 
-                        Msg.To.RemoveAt(0);
+                        msg.To.RemoveAt(0);
                         exceptionIsOccurred = false;
                     }
-                    catch(Exception SendEx)
+                    catch(Exception sendEx)
                     {
                         unSentListRow++;
 
                         exceptionIsOccurred = true;
                         exceptionInSendProcess = true;
 
-                        IXLCell unSentAdress = unSentAdressSheet.Cell(unSentListRow, 1);
-                        unSentAdress.SetValue<object>(toad);
+                        var unSentAdress = unSentAdressSheet.Cell(unSentListRow, 1);
+                        unSentAdress.SetValue(toad);
 
-                        IXLCell unSentNumber = unSentAdressSheet.Cell(unSentListRow, 2);
-                        unSentNumber.SetValue<object>(exnum);
+                        var unSentNumber = unSentAdressSheet.Cell(unSentListRow, 2);
+                        unSentNumber.SetValue(exnum);
 
-                        ErrorLogWriter(SendEx);
+                        ErrorLogWriter(sendEx);
 
                         //Continue mailing process when exception occurred.
                         goto ContinueSending;
                     }
                 }
             }
-            catch(Exception ExcelEx)
+            catch(Exception excelEx)
             {
                 exceptionIsOccurred = true;
 
-                ErrorLogWriter(ExcelEx);
+                ErrorLogWriter(excelEx);
             }
 
             unSentAdressList.SaveAs("送信失敗リスト.xlsx");
 
-            if(exceptionIsOccurred == true)
+            if(exceptionIsOccurred)
             {
-                ProgWin.Close();
+                progWin.Close();
                 client.Disconnect(true);
                 MessageBox.Show("必要事項および説明書を確認の上、もう一度お試しください。");
             }
-            if(exceptionInSendProcess == true)
+            if(exceptionInSendProcess)
             {
-                ProgWin.Close();
+                progWin.Close();
                 client.Disconnect(true);
                 MessageBox.Show("一部のメールが正しく送信されませんでした。「送信失敗リスト.xlsx」を参照してください。");
             }
             else
             {
-                ProgWin.Close();
+                progWin.Close();
                 client.Disconnect(true);
                 MessageBox.Show("メールが正常に送信されました。");
             }
