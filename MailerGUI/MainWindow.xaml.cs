@@ -45,27 +45,19 @@ namespace MailerGUI
                 throw new ArgumentNullException(nameof(act));
             }
 
-            var topElm = ((UIElement)VisualTreeHelper.GetChild(this, 0));
-            var oldEnabled = topElm.IsEnabled;
-            var oldCursor = Cursor;
+            var topElement = ((UIElement)VisualTreeHelper.GetChild(this, 0));
+
             try
             {
                 Cursor = Cursors.Wait;
-                topElm.IsEnabled = false;
+                topElement.IsEnabled = false;
                 await act();
             }
             finally
             {
-                topElm.IsEnabled = oldEnabled;
-                Cursor = oldCursor;
+                topElement.IsEnabled = true;
+                Cursor = Cursors.AppStarting;
             }
-        }
-
-        private static void ErrorLogWriter(Exception ex)
-        {
-            var writer = new StreamWriter("./errorlog.txt", true, new UTF8Encoding(false));
-            writer.WriteLine("ErrorMessage:" + ex.Message);
-            writer.WriteLine("StackTrace:" + ex.StackTrace);
         }
 
         private async void Button_Click_async(object sender, RoutedEventArgs e)
@@ -185,8 +177,6 @@ namespace MailerGUI
                         var unSentNumber = unSentAdressSheet.Cell(unSentListRow, 2);
                         unSentNumber.SetValue(exnum);
 
-                        ErrorLogWriter(sendEx);
-
                         //Continue mailing process when exception occurred.
                         goto ContinueSending;
                     }
@@ -195,8 +185,6 @@ namespace MailerGUI
             catch(Exception excelEx)
             {
                 exceptionIsOccurred = true;
-
-                ErrorLogWriter(excelEx);
             }
 
             unSentAdressList.SaveAs("送信失敗リスト.xlsx");
