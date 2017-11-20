@@ -47,17 +47,13 @@ namespace MailerGUI
 
             var topElement = ((UIElement)VisualTreeHelper.GetChild(this, 0));
 
-            try
-            {
-                Cursor = Cursors.Wait;
-                topElement.IsEnabled = false;
-                await act();
-            }
-            finally
-            {
-                topElement.IsEnabled = true;
-                Cursor = Cursors.AppStarting;
-            }
+            Cursor = Cursors.Wait;
+            topElement.IsEnabled = false;
+            await act();
+
+            topElement.IsEnabled = true;
+            Cursor = Cursors.AppStarting;
+
         }
 
         private async void Button_Click_async(object sender, RoutedEventArgs e)
@@ -76,11 +72,9 @@ namespace MailerGUI
 
             if (result == MessageBoxResult.OK)
             {
-                await LockUi(Act);
+                await LockUi(Mailing);
             }
         }
-
-        private async Task Act() => await Mailing();
 
         public async Task Mailing()
         {
@@ -108,7 +102,7 @@ namespace MailerGUI
 
             try
             {
-                await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
+                client.Connect("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
 
                 client.Authenticate(fromAdress, mailPass);
@@ -161,14 +155,13 @@ namespace MailerGUI
 
                         await client.SendAsync(msg);
 
+                        //これつけないと他の人のメアドが全部Toに表示される。
                         msg.To.RemoveAt(0);
-                        exceptionIsOccurred = false;
                     }
-                    catch(Exception sendEx)
+                    catch(Exception)
                     {
                         unSentListRow++;
 
-                        exceptionIsOccurred = true;
                         exceptionInSendProcess = true;
 
                         var unSentAdress = unSentAdressSheet.Cell(unSentListRow, 1);
@@ -177,14 +170,15 @@ namespace MailerGUI
                         var unSentNumber = unSentAdressSheet.Cell(unSentListRow, 2);
                         unSentNumber.SetValue(exnum);
 
-                        //Continue mailing process when exception occurred.
+                        //送信中に例外拾っても最後まで送る。
                         goto ContinueSending;
                     }
                 }
             }
-            catch(Exception excelEx)
+            catch(Exception excelException)
             {
                 exceptionIsOccurred = true;
+                MessageBox.Show(excelException.Message,"エラー");
             }
 
             unSentAdressList.SaveAs("送信失敗リスト.xlsx");
